@@ -1,113 +1,110 @@
 const cards = document.querySelectorAll(".card"),
-timeTag = document.querySelector(".time b"),
-flipsTag = document.querySelector(".flips b"),
-refreshBtn = document.querySelector(".details button");
+  timeTag = document.querySelector(".time b"),
+  flipsTag = document.querySelector(".flips b"),
+  refreshBtn = document.querySelector(".details button");
 const timeLeftElement = document.querySelector(".time-left");
-const timerPop = document.querySelector(".win-pop")
+const timerPop = document.querySelector(".win-pop");
+const timesUpPop = document.querySelector(".times-up-pop");
+const closeButton = timesUpPop.querySelector(".close-button");
 
-// timerPop.classList.add("active");
+closeButton.addEventListener("click", () => {
+  timesUpPop.classList.remove("active");
+  startGame();
+});
 
 let maxTime = 20;
 let timeLeft = maxTime;
 let flips = 0;
 let matchedCard = 0;
-let disableDeck = false;
 let isPlaying = false;
-let cardOne, cardTwo, timer;
+let cardOne = null;
+let cardTwo = null;
+let timer = null;
 
 function initTimer() {
-    if(timeLeft <= 0) {
-    // timerPop.classList.add("active");
-
-        return clearInterval(timer);
-        
-    }
+  if (timeLeft <= 0) {
+    clearInterval(timer);
+    timeLeft = 0;
+    timeTag.innerText = timeLeft;
+    timeLeftElement.textContent = timeLeft;
+    timesUpPop.classList.add("active");
+  } else {
     timeLeft--;
     timeTag.innerText = timeLeft;
     timeLeftElement.textContent = timeLeft;
-    
+  }
 }
 
-function flipCard({target: clickedCard}) {
-    if(!isPlaying) {
-        isPlaying = true;
-        timer = setInterval(initTimer, 1000);
-    }
-    if(clickedCard !== cardOne && !disableDeck && timeLeft > 0) {
-        flips++;
-        flipsTag.innerText = flips;
-        clickedCard.classList.add("flip");
-        if(!cardOne) {
-            return cardOne = clickedCard;
-        }
-        cardTwo = clickedCard;
-        disableDeck = true;
-        let cardOneImg = cardOne.querySelector(".back-view img").src,
-        cardTwoImg = cardTwo.querySelector(".back-view img").src;
-        matchCards(cardOneImg, cardTwoImg);
-    }
+function flipCard({ target: clickedCard }) {
+  if (!isPlaying) {
+    isPlaying = true;
+    timer = setInterval(initTimer, 1000);
+  }
+  if (clickedCard !== cardOne && !cardOne) {
+    cardOne = clickedCard;
+    cardOne.classList.add("flip");
+  } else if (clickedCard !== cardOne && !cardTwo) {
+    cardTwo = clickedCard;
+    cardTwo.classList.add("flip");
+    disableCardClick(); // Disable card clicks until we check for a match
+    checkForMatch();
+  }
 }
 
-function matchCards(img1, img2) {
-    if(img1 === img2) {
-        matchedCard++;
-        checkGameCompletion();
-        if(matchedCard == 6 && timeLeft > 0) {
-            return clearInterval(timer);
-        }
-        cardOne.removeEventListener("click", flipCard);
-        cardTwo.removeEventListener("click", flipCard);
-        cardOne = cardTwo = "";
-        return disableDeck = false;
-    }
-    
-    setTimeout(() => {
-        cardOne.classList.add("shake");
-        cardTwo.classList.add("shake");
-    }, 400);
-    
-    setTimeout(() => {
-        cardOne.classList.remove("shake", "flip");
-        cardTwo.classList.remove("shake", "flip");
-        cardOne = cardTwo = "";
-        disableDeck = false;
-    }, 1200);
+function checkForMatch() {
+  if (cardOne && cardTwo) {
+    let cardOneImg = cardOne.querySelector(".back-view img").src;
+    let cardTwoImg = cardTwo.querySelector(".back-view img").src;
 
-}
-function checkGameCompletion() {
-    if (matchedCard === 6 && timeLeft > 0) {
-      timerPop.classList.add("active");
+    if (cardOneImg === cardTwoImg) {
+      matchedCard++;
+      cardOne.removeEventListener("click", flipCard);
+      cardTwo.removeEventListener("click", flipCard);
+      cardOne = null;
+      cardTwo = null;
+      enableCardClick(); // Re-enable card clicks
+      if (matchedCard === 6) {
+        clearInterval(timer);
+        timerPop.classList.add("active");
+      }
+    } else {
+      setTimeout(() => {
+        cardOne.classList.remove("flip");
+        cardTwo.classList.remove("flip");
+        cardOne = null;
+        cardTwo = null;
+        enableCardClick(); // Re-enable card clicks
+      }, 1000);
     }
   }
-
-function shuffleCard() {
-    timeLeft = maxTime;
-    flips = matchedCard = 0;
-    cardOne = cardTwo = "";
-    clearInterval(timer);
-    timeTag.innerText = timeLeft;
-    flipsTag.innerText = flips;
-    disableDeck = isPlaying = false;
-
-    let arr = [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6];
-    arr.sort(() => Math.random() > 0.5 ? 1 : -1);
-
-    cards.forEach((card, index) => {
-        card.classList.remove("flip");
-        let imgTag = card.querySelector(".back-view img");
-        setTimeout(() => {
-            imgTag.src = `images/img-${arr[index]}.png`;
-        }, 500);
-        card.addEventListener("click", flipCard);
-        
-    });
-    checkGameCompletion();
 }
 
-shuffleCard();
+function disableCardClick() {
+  cards.forEach(card => card.removeEventListener("click", flipCard));
+}
 
-refreshBtn.addEventListener("click", shuffleCard);
+function enableCardClick() {
+  cards.forEach(card => card.addEventListener("click", flipCard));
+}
 
-cards.forEach(card => {
-    card.addEventListener("click", flipCard);
-});
+function startGame() {
+  timeLeft = maxTime;
+  flips = 0;
+  matchedCard = 0;
+  cardOne = null;
+  cardTwo = null;
+  clearInterval(timer);
+  timeTag.innerText = timeLeft;
+  flipsTag.innerText = flips;
+  isPlaying = false;
+  enableCardClick();
+  shuffleCard();
+}
+
+function shuffleCard() {
+  // Implement card shuffling logic here
+}
+
+startGame();
+
+refreshBtn.addEventListener("click", startGame);
