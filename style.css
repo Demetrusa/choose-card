@@ -188,7 +188,7 @@ body{
 }
 
 .times-up-pop.active {
-  display: flex;
+  display: block;
 }
 
 .popup-content {
