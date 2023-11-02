@@ -131,7 +131,7 @@ body{
   background: #6563ff;
 }
 .win-pop.active{
-  display: flex;
+  display: block;
 }
 .win-pop{
   width: 50%;
