@@ -3,9 +3,11 @@ timeTag = document.querySelector(".time b"),
 flipsTag = document.querySelector(".flips b"),
 refreshBtn = document.querySelector(".details button");
 const timeLeftElement = document.querySelector(".time-left");
+const timerPop = document.querySelector(".win-pop")
 
+// timerPop.classList.add("active");
 
-let maxTime = 30;
+let maxTime = 20;
 let timeLeft = maxTime;
 let flips = 0;
 let matchedCard = 0;
@@ -15,12 +17,15 @@ let cardOne, cardTwo, timer;
 
 function initTimer() {
     if(timeLeft <= 0) {
+    // timerPop.classList.add("active");
+
         return clearInterval(timer);
+        
     }
     timeLeft--;
     timeTag.innerText = timeLeft;
-    timeLeftElement.textContent = timeLeft; // Update the time-left element
-
+    timeLeftElement.textContent = timeLeft;
+    
 }
 
 function flipCard({target: clickedCard}) {
@@ -46,6 +51,7 @@ function flipCard({target: clickedCard}) {
 function matchCards(img1, img2) {
     if(img1 === img2) {
         matchedCard++;
+        checkGameCompletion();
         if(matchedCard == 6 && timeLeft > 0) {
             return clearInterval(timer);
         }
@@ -54,19 +60,25 @@ function matchCards(img1, img2) {
         cardOne = cardTwo = "";
         return disableDeck = false;
     }
-
+    
     setTimeout(() => {
         cardOne.classList.add("shake");
         cardTwo.classList.add("shake");
     }, 400);
-
+    
     setTimeout(() => {
         cardOne.classList.remove("shake", "flip");
         cardTwo.classList.remove("shake", "flip");
         cardOne = cardTwo = "";
         disableDeck = false;
     }, 1200);
+
 }
+function checkGameCompletion() {
+    if (matchedCard === 6 && timeLeft > 0) {
+      timerPop.classList.add("active");
+    }
+  }
 
 function shuffleCard() {
     timeLeft = maxTime;
@@ -87,7 +99,9 @@ function shuffleCard() {
             imgTag.src = `images/img-${arr[index]}.png`;
         }, 500);
         card.addEventListener("click", flipCard);
+        
     });
+    checkGameCompletion();
 }
 
 shuffleCard();
