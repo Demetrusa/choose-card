@@ -3,7 +3,6 @@ timeTag = document.querySelector(".time b"),
 flipsTag = document.querySelector(".flips b"),
 refreshBtn = document.querySelector(".details button");
 const timeLeftElement = document.querySelector(".time-left");
-const winPop = document.querySelector(".win-pop")
 
 
 let maxTime = 30;
@@ -21,7 +20,6 @@ function initTimer() {
     timeLeft--;
     timeTag.innerText = timeLeft;
     timeLeftElement.textContent = timeLeft; // Update the time-left element
-    popUpElement.classList.add("active");
 
 }
 
@@ -61,7 +59,7 @@ function matchCards(img1, img2) {
         cardOne.classList.add("shake");
         cardTwo.classList.add("shake");
     }, 400);
-    winPop.classList.add("active");
+
     setTimeout(() => {
         cardOne.classList.remove("shake", "flip");
         cardTwo.classList.remove("shake", "flip");
@@ -90,7 +88,6 @@ function shuffleCard() {
         }, 500);
         card.addEventListener("click", flipCard);
     });
-    
 }
 
 shuffleCard();
