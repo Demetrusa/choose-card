@@ -12,7 +12,7 @@ closeButton.addEventListener("click", () => {
   startGame();
 });
 
-let maxTime = 20;
+let maxTime = 30;
 let timeLeft = maxTime;
 let flips = 0;
 let matchedCard = 0;
